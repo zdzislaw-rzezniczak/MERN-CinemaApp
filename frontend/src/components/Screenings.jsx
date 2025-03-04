@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 // eslint-disable-next-line react/prop-types
 const Screenings = ({ onLogout, fetchInfo }) => {
     const [data, setData] = useState([]); // Ensure the initial state is an empty array
-    const [error, setError] = useState(''); // For error handling
+    const [error] = useState(''); // For error handling
 
 
 

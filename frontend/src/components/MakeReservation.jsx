@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
-import {PDFDownloadLink} from '@react-pdf/renderer';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import { Page, Text, Document, StyleSheet } from '@react-pdf/renderer';
 
-
+// Komponent PDF
 // eslint-disable-next-line react/prop-types
-const MyDocument = ({roomNumber, selectedSeats, movieTitle, time, date}) => (
+const MyDocument = ({ roomNumber, selectedSeats, movieTitle, time, date }) => (
     <Document>
         <Page style={styles.page}>
-            <Text style={styles.title}>My First PDF</Text>
+            <Text style={styles.title}>Rezerwacja!</Text>
             <Text style={styles.title}>Room number: {roomNumber}</Text>
             <Text style={styles.title}>Movie: {movieTitle}</Text>
             <Text style={styles.title}>Date: {date}</Text>
-            <Text style={styles.title}>time: {time}</Text>
-            <Text style={styles.title}>{selectedSeats}</Text>
-            <Text style={styles.body}>This is a sample PDF created using @react-pdf/renderer.</Text>
+            <Text style={styles.title}>Time: {time}</Text>
+            {/* eslint-disable-next-line react/prop-types */}
+            <Text style={styles.title}>Selected seats: {selectedSeats.join(', ')}</Text>
         </Page>
     </Document>
 );
@@ -30,21 +30,18 @@ const styles = StyleSheet.create({
         fontSize: 24,
         marginBottom: 10,
     },
-    body: {
-        fontSize: 12,
-    },
 });
 
 // eslint-disable-next-line react/prop-types
 const MakeReservation = ({ fetchInfo }) => {
-    const { roomId} = useParams();
-    const { screeningId  } = useParams();
+    const { roomId, screeningId } = useParams();
     const url = `http://localhost:5000/api/screenings/room/${roomId}`;
     const [data, setData] = useState(null); // Dane pokoju
-    const [dataScreening, setDataScreening] = useState(null); // Dane pokoju
-    const [error, setError] = useState(null); // Błędy
-    const [loading, setLoading] = useState(true); // Ładowanie
+    const [dataScreening, setDataScreening] = useState(null); // Dane seansu
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [selectedSeats, setSelectedSeats] = useState([]); // ID zaznaczonych miejsc
+    const [selectedSeatNumbers, setSelectedSeatNumbers] = useState([]); // Numery zaznaczonych miejsc
     const [userId, setUserId] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
 
@@ -59,7 +56,7 @@ const MakeReservation = ({ fetchInfo }) => {
                     setError('No room data available.');
                 }
             } catch (err) {
-                setError('Failed to fetch room data.'+ err);
+                setError('Failed to fetch room data.' + err);
             } finally {
                 setLoading(false);
             }
@@ -68,47 +65,40 @@ const MakeReservation = ({ fetchInfo }) => {
         fetchRoom();
     }, [fetchInfo, url]);
 
-
-    const toggleSeatSelection = (seatId) => {
+    const toggleSeatSelection = (seatId, seatNumber) => {
         setSelectedSeats((prevSelectedSeats) => {
-            // console.log(selectedSeats)
             if (prevSelectedSeats.includes(seatId)) {
+                // Usuń miejsce z selectedSeats i selectedSeatNumbers
+                setSelectedSeatNumbers((prev) => prev.filter((num) => num !== seatNumber));
                 return prevSelectedSeats.filter((id) => id !== seatId);
             } else {
+                // Dodaj miejsce do selectedSeats i selectedSeatNumbers
+                setSelectedSeatNumbers((prev) => [...prev, seatNumber]);
                 return [...prevSelectedSeats, seatId];
             }
-
         });
     };
 
-
     const urlScreening = `${import.meta.env.VITE_BACKEND_URL}screenings/${screeningId}`;
     useEffect(() => {
-       setUserId(getUserId())
+        setUserId(getUserId());
 
         fetchInfo(urlScreening).then(screening => {
             console.log(screening);
-            setDataScreening(screening.result)
+            setDataScreening(screening.result);
         });
-
     }, []);
 
-
     const getUserId = () => {
-        const token = sessionStorage.getItem('authToken'); // Pobierz token
-        // console.log(token);
+        const token = sessionStorage.getItem('authToken');
         if (!token) {
             console.error('No token found.');
             return null;
         }
 
         try {
-
-            const decoded = jwtDecode(token,`${import.meta.env.VITE_BACKEND_URL}`);
-
-            const userId = decoded.id
-            return userId;
-
+            const decoded = jwtDecode(token, `${import.meta.env.VITE_BACKEND_URL}`);
+            return decoded.id;
         } catch (err) {
             console.error('Failed to decode token:', err);
             return null;
@@ -121,9 +111,6 @@ const MakeReservation = ({ fetchInfo }) => {
             return;
         }
 
-        // Ensure seats are formatted correctly for the API
-        // const formattedSeats = selectedSeats.map(seat => seat);
-
         const reservationData = {
             screening_id: screeningId,
             user_id: userId,
@@ -133,7 +120,6 @@ const MakeReservation = ({ fetchInfo }) => {
         console.log("Reservation Data:", JSON.stringify(reservationData));
 
         const token = sessionStorage.getItem('authToken');
-
         if (!token) {
             setError('No token found. Please log in.');
             return;
@@ -150,25 +136,19 @@ const MakeReservation = ({ fetchInfo }) => {
             });
 
             const result = await response.json();
-
             if (!response.ok) {
                 console.error('Reservation error details:', result);
                 setError(result?.error?.message || result?.msg || 'Failed to create reservation');
                 return;
             }
 
-
-
             setSuccessMessage('Reservation successful!');
             console.log('API Response:', result);
-
         } catch (err) {
             setError('Error making reservation');
             console.error('Error in makeReserv:', err);
         }
     };
-
-
 
     if (loading) {
         return <p>Loading room data...</p>;
@@ -181,6 +161,8 @@ const MakeReservation = ({ fetchInfo }) => {
     if (!data) {
         return <p>No room data found.</p>;
     }
+
+
 
     return (
         <div>
@@ -200,7 +182,7 @@ const MakeReservation = ({ fetchInfo }) => {
                         }
                         onClick={() => {
                             if (!seat.isReserved) {
-                                toggleSeatSelection(seat._id);
+                                toggleSeatSelection(seat._id, seat.seatNumber);
                             }
                         }}
                     >
@@ -218,8 +200,8 @@ const MakeReservation = ({ fetchInfo }) => {
                             roomNumber={data.roomNumber}
                             movieTitle={dataScreening?.movie_id?.title || 'Unknown'}
                             time={dataScreening?.time || 'Unknown'}
-                            date={dataScreening?.date || 'Unknown'}
-                            selectedSeats={selectedSeats.join(', ')}
+                            date={dataScreening.date.slice(0,10) || 'Unknown'}
+                            selectedSeats={selectedSeatNumbers.slice(1)} // Przekazujemy numery miejsc
                         />
                     ) : (
                         <Document>
@@ -235,8 +217,6 @@ const MakeReservation = ({ fetchInfo }) => {
                     loading ? 'Preparing document...' : 'Download your reservation as PDF'
                 }
             </PDFDownloadLink>
-
-
         </div>
     );
 };

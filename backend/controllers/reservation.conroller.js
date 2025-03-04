@@ -28,10 +28,6 @@ const getReservationsByScreeningId = async (req, res) => {
 
             })
 
-
-
-
-
         console.log(reservations);
         if (!reservations) {
             return res.status(404).json({message: 'No reservation found for this screening.'});
