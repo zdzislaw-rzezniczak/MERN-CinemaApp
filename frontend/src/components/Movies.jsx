@@ -12,7 +12,6 @@ const Movies = ({ onLogout, fetchInfo }) => {
 
        fetchInfo(url)
            .then(movies => {
-               console.log(movies);
                setData(movies.result);
            });
 

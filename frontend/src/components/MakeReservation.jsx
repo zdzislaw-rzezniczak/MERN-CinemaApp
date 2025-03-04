@@ -5,6 +5,7 @@ import {PDFDownloadLink} from '@react-pdf/renderer';
 import { Page, Text, Document, StyleSheet } from '@react-pdf/renderer';
 
 
+// eslint-disable-next-line react/prop-types
 const MyDocument = ({roomNumber, selectedSeats, movieTitle, time, date}) => (
     <Document>
         <Page style={styles.page}>
