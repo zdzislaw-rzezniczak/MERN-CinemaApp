@@ -11,7 +11,7 @@ const  {
 const isAdmin = require("../middleware/isAdmin.middleware");
 const {verifyToken} = require("../middleware/jwt.middleware");
 
-router.get('/', verifyToken, getMovies)
+router.get('/',  getMovies)
 
 router.get('/:id', verifyToken, getMovieById)
 

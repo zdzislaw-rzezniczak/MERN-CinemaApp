@@ -15,7 +15,7 @@ router.get('/', verifyToken, getReservations)
 
 router.get('/:id', verifyToken, getReservationById)
 
-router.post('/', isAdmin, createReservation)
+router.post('/', verifyToken, createReservation)
 
 router.put('/:id', isAdmin, updateReservation)
 

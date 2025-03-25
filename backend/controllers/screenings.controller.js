@@ -94,24 +94,28 @@ const createScreening = async (req, res) => {
     try {
         const { movie_id, room_id, date, time } = req.body;
 
-        // Validate movie existence
-        const movie = await Movie.findById(movie_id);
-        if (!movie) {
-            return res.status(404).json({ msg: 'Movie not found' });
-        }
 
-        // Validate room existence
-        const room = await Room.findById(room_id);
-        if (!room) {
-            return res.status(404).json({ msg: 'Room not found' });
-        }
+        const [movie, room] = await Promise.all([
+            Movie.findById(movie_id),
+            Room.findById(room_id).populate('seats')
+        ]);
 
-        // Create the screening
+        if (!movie) return res.status(404).json({ msg: 'Movie not found' });
+        if (!room) return res.status(404).json({ msg: 'Room not found' });
+
+
+        const seatAvailability = {};
+        room.seats.forEach(seat => {
+            seatAvailability[seat._id] = true;
+        });
+
+
         const newScreening = new Screening({
             movie_id,
             date,
             time,
-            room_id
+            room_id,
+            seatAvailability
         });
 
         const savedScreening = await newScreening.save();
@@ -120,8 +124,10 @@ const createScreening = async (req, res) => {
         console.error('Error creating screening:', error);
         res.status(500).json({ msg: 'Failed to create screening', error });
     }
-};
 
+
+
+};
 
 const getRoomDetails = async (req, res) => {
     const roomId  = req.params.id; // Assuming roomId is passed as a parameter in the request.
@@ -145,8 +151,16 @@ const getRoomDetails = async (req, res) => {
     }
 };
 
+const getRooms = async (req, res) => {
+    try {
+        const rooms = await Room.find(); // Pobiera wszystkie sale kinowe
+        res.json(rooms);
+    } catch (error) {
+        console.error('Error fetching rooms:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 
 
 
-
-module.exports = { getRoomDetails, createScreening, getScreenings, getScreeningByID, deleteScreening, updateScreening, createRoom};
+module.exports = { getRooms, getRoomDetails, createScreening, getScreenings, getScreeningByID, deleteScreening, updateScreening, createRoom};

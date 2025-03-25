@@ -38,7 +38,7 @@ const Screenings = ({ onLogout, fetchInfo }) => {
                                 <p>Description: {screening.movie_id.description}</p>
                             </>
                         )}
-                        {screening.room_id && <p>Room Number: {screening.room_id}</p>}
+                        {screening.room_id && <p>Room Number: {screening.roomNumber}</p>}
                         <Link to={`/reservations/room/${screening.room_id}/${screening._id}`} style={{ color: 'blue', textDecoration: 'underline' }}>
                             Make a Reservation
                         </Link>
@@ -50,6 +50,11 @@ const Screenings = ({ onLogout, fetchInfo }) => {
                 <p>No screenings available or failed to load.</p>
             )}
 
+            <Link to="/screenings/make">
+                <button style={{ padding: '0.5rem 1rem', marginTop: '1rem' }}>
+                    Create screening
+                </button>
+            </Link>
             <button onClick={onLogout} style={{ padding: '0.5rem 1rem', marginTop: '1rem' }}>
                 Logout
             </button>

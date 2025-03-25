@@ -15,11 +15,11 @@ app.use(express.json());
 app.listen(port, () => {
     console.log(`CinemaApp listening at http://localhost:${port}`);
 });
-
+const mongoDB = 'mongodb://127.0.0.1/cinemaApp';
 
 mongoose.set("strictQuery", false);
 mongoose.set('strictPopulate', false);
-const mongoDB = process.env.MONGODB;
+// const mongoDB = process.env.MONGODB;
 main().catch((err) => console.log(err));
 async function main() {
     await mongoose.connect(mongoDB);
@@ -53,3 +53,6 @@ app.use('/api/auth', authRoutes);
 
 const reservationsRoutes = require('./routes/reservation.routes');
 app.use('/api/reservations', reservationsRoutes);
+
+const roomRoutes = require('./routes/room.routes');
+app.use('/api/rooms', roomRoutes); // To musi być!

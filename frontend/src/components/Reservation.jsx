@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 const Reservation = ({ fetchInfo }) => {
     const {screeningId} = useParams(); // Extract the screening ID from the URL
     const [data, setData] = useState([]);
-    const [dataScreening, setDataScreening] = useState([]);
+    const [, setDataScreening] = useState([]);
     const [error, setError] = useState(null); // State to track errors
     const [loading, setLoading] = useState(true); // State to show a loading spinner
 

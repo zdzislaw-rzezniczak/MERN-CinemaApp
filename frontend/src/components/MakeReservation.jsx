@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
 // eslint-disable-next-line react/prop-types
 const MakeReservation = ({ fetchInfo }) => {
     const { roomId, screeningId } = useParams();
-    const url = `http://localhost:5000/api/screenings/room/${roomId}`;
+    const url = `http://localhost:5000/api/rooms/room/${roomId}`;
     const [data, setData] = useState(null); // Dane pokoju
     const [dataScreening, setDataScreening] = useState(null); // Dane seansu
     const [error, setError] = useState(null);

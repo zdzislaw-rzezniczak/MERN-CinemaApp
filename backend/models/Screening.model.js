@@ -21,7 +21,20 @@ const ScreeningSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room',
         required: true
-    }
+    },
+
+    // seatsQuantity: {
+    //     type: Number,
+    //     required: true,
+    //     default: 10
+    // },
+    // seats: [
+    //     {
+    //         seatNumber: { type: Number, required: true },
+    //         isReserved: { type: Boolean, default: false }
+    //     }
+    // ]
+
 });
 
 

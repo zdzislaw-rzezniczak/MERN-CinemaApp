@@ -8,6 +8,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Reservation from "./components/Reservation.jsx";
 import MakeReservation from "./components/MakeReservation.jsx";
 import CreateMovie from "./components/CreateMovie.jsx";
+import CreateScreening from "./components/MakeScreening.jsx";
 
 
 
@@ -83,6 +84,7 @@ function App() {
                         </PrivateRoute>
                     }
                 />
+
                 <Route
                     path="reservations/screening/:screeningId"
                     element={
@@ -96,6 +98,15 @@ function App() {
                     element={
                         <PrivateRoute token={token}>
                             <MakeReservation fetchInfo={fetchInfo}/>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="screenings/make"
+                    element={
+                        <PrivateRoute token={token}>
+                            <CreateScreening fetchInfo={fetchInfo} />
                         </PrivateRoute>
                     }
                 />

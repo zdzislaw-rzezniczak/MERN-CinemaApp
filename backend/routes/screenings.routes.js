@@ -10,28 +10,16 @@ const  {
     createScreening,
     updateScreening,
     deleteScreening,
-    createRoom,
-    getRoomDetails
 } = require('../controllers/screenings.controller.js')
 
-
-
-
-
-
-router.get('/', verifyToken,  getScreenings)
+router.get('/',  getScreenings)
 
 router.get('/:id', verifyToken, getScreeningByID)
 
 router.post('/', isAdmin, createScreening)
 
-router.post('/room', isAdmin, createRoom)
-
-router.get('/room/:id', verifyToken, getRoomDetails)
-
-
 router.put('/:id', isAdmin, updateScreening)
-//
+
 router.delete('/:id', isAdmin, deleteScreening)
 
 module.exports = router
