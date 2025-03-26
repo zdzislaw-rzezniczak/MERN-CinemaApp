@@ -55,72 +55,40 @@ const getReservationById = ((req, res) => {
 
 
 const createReservation = async (req, res) => {
-    const { screening_id, seats, user_id } = req.body;
-
-
     try {
+        const { screening_id, user_id, seats } = req.body;
 
+        console.log("Received Reservation Request:", req.body);
 
-       const screening = await Screening.findById(screening_id);
-        const room = await Room.findById(screening.room_id.toString());
-        // console.log(room)
-
-        if (!room) {
-            return res.status(404).json({ msg: 'Room not found.' });
+        if (!seats || !Array.isArray(seats)) {
+            return res.status(400).json({ msg: "Invalid seats data. Expected an array." });
         }
 
-        if (!Array.isArray(seats) || seats.some(seat => !mongoose.Types.ObjectId.isValid(seat))) {
-            return res.status(400).json({ msg: 'Invalid seat IDs provided.' });
+        // Pobierz seans z bazy danych
+        const screening = await Screening.findById(screening_id);
+        if (!screening) {
+            return res.status(404).json({ msg: "Screening not found" });
         }
 
-        // Find reservations for the same screening with overlapping seats
-        const existingReservations = await Reservation.find({
-            screening_id,
-            seats: { $in: seats },
-        });
+        console.log("Screening found:", screening);
 
-        if (existingReservations.length > 0) {
-            return res.status(400).json({ msg: 'One or more seats are already reserved for this screening.' });
-        }
-        // console.log(seats)
-        seats.forEach(chosenSeat => {
-            // console.log(chosenSeat);
-            if (!chosenSeat) {
-                console.error('Chosen seat has no _id:', chosenSeat);
-                return;
+        // Aktualizuj status rezerwacji dla wybranych miejsc
+        screening.seats.forEach((seat) => {
+            if (seats.includes(String(seat._id))) {
+                console.log("Marking seat as reserved:", seat._id);
+                seat.isReserved = true;
             }
-
-            room.seats.forEach(seat => {
-                    // console.log(seat._id.toString());
-                    // console.log(chosenSeat._id);
-                if(seat._id.toString() === chosenSeat) {
-                    seat.isReserved = true;
-                    console.log(seat);
-                }
-            });
-
         });
 
-        room.save();
+        // Zapisz zmiany w bazie danych
+        await screening.save();
 
-        // Create the new reservation
-        const newReservation = new Reservation({
-            screening_id,
-            seats,
-            user_id,
-        });
-
-        const savedReservation = await newReservation.save();
-
-        res.status(201).json(savedReservation);
+        res.status(201).json({ msg: "Reservation successful!", updatedScreening: screening });
     } catch (error) {
-        console.error('Error creating reservation:', error);
-        res.status(500).json({ msg: 'Failed to create reservation', error });
+        console.error("Error creating reservation:", error);
+        res.status(500).json({ msg: "Server error", error });
     }
 };
-
-
-
 
 
 

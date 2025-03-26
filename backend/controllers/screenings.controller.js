@@ -1,15 +1,14 @@
 const Screening = require('../models/Screening.model');
 const Room = require('../models/Room.model');
 const Movie = require("../models/Movie.model");
-const Seat = require("../models/Room.model");
-const {populate} = require("dotenv");
-const req = require("express/lib/request");
+// const Seat = require("../models/Room.model");
+// const {populate} = require("dotenv");
+// const req = require("express/lib/request");
 
 const getScreenings = async (req, res) => {
     try {
         const screenings = await Screening.find()
-            .populate('movie_id', 'title description') // Pobiera tytuł filmu
-             // Pobiera numer pokoju
+            .populate('movie_id', 'title description')
         console.log(screenings)
         res.status(200).json({ result: screenings });
 
@@ -20,18 +19,16 @@ const getScreenings = async (req, res) => {
 };
 
 const getScreeningByID = async (req, res) => {
-   await Screening.findOne({ _id: req.params.id })
-       .populate("room_id")
-       .populate('seat_id')
-       .populate("movie_id")
-       .populate("room_id")
+    await Screening.findOne({ _id: req.params.id })
+        .populate("room_id", "roomNumber seatsQuantity seats") // Pobiera również miejsca
+        .populate("seats") // Dodane, aby zwrócić pełne obiekty miejsc
+        .populate("movie_id", "title")
         .then(result => {
             if (!result) {
                 return res.status(404).json({ msg: 'Screening not found' });
             }
             res.status(200).json({ result });
         })
-
         .catch(error => res.status(500).json({ msg: 'Error fetching screening', error }));
 };
 
@@ -66,17 +63,17 @@ const createRoom = async (req, res) => {
             return res.status(400).json({ msg: "Seats quantity must be a positive number." });
         }
 
-        // Generate seats directly in the Room schema
-        const seats = Array.from({ length: seatsQuantity }, (_, i) => ({
-            seatNumber: i + 1,
-            isReserved: false
-        }));
+        // // Generate seats directly in the Room schema
+        // const seats = Array.from({ length: seatsQuantity }, (_, i) => ({
+        //     seatNumber: i + 1,
+        //     isReserved: false
+        // }));
 
         // Create the room with generated seats
         const room = new Room({
             roomNumber,
             seatsQuantity,
-            seats,
+
         });
 
         const savedRoom = await room.save();
@@ -99,15 +96,22 @@ const createScreening = async (req, res) => {
             Movie.findById(movie_id),
             Room.findById(room_id).populate('seats')
         ]);
+/////////////////////////////////////////////////////////////////
+
+        const seatsQuantity = room.seatsQuantity;
+
+        // Generate seats directly in the Room schema
+        const seats = Array.from({ length: seatsQuantity }, (_, i) => ({
+            seatNumber: i + 1,
+            isReserved: false
+        }));
+
 
         if (!movie) return res.status(404).json({ msg: 'Movie not found' });
         if (!room) return res.status(404).json({ msg: 'Room not found' });
 
 
-        const seatAvailability = {};
-        room.seats.forEach(seat => {
-            seatAvailability[seat._id] = true;
-        });
+
 
 
         const newScreening = new Screening({
@@ -115,7 +119,8 @@ const createScreening = async (req, res) => {
             date,
             time,
             room_id,
-            seatAvailability
+            seatsQuantity: room.seatsQuantity,
+            seats
         });
 
         const savedScreening = await newScreening.save();

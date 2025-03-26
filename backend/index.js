@@ -17,6 +17,15 @@ app.listen(port, () => {
 });
 const mongoDB = 'mongodb://127.0.0.1/cinemaApp';
 
+
+
+// Swagger
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+
+
 mongoose.set("strictQuery", false);
 mongoose.set('strictPopulate', false);
 // const mongoDB = process.env.MONGODB;

@@ -12,12 +12,12 @@ const RoomSchema = new mongoose.Schema({
         required: true,
         default: 10
     },
-    seats: [
-        {
-            seatNumber: { type: Number, required: true },
-            isReserved: { type: Boolean, default: false }
-        }
-    ]
+    // seats: [
+    //     {
+    //         seatNumber: { type: Number, required: true },
+    //         isReserved: { type: Boolean, default: false }
+    //     }
+    // ]
 });
 
 module.exports = mongoose.model('Room', RoomSchema);
