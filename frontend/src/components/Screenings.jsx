@@ -27,7 +27,7 @@ const Screenings = ({ onLogout, fetchInfo }) => {
 
             {error && <p style={{ color: 'red' }}>{error}</p>}
 
-            {Array.isArray(data) && data.length > 0 ? ( // Ensure 'data' is an array before rendering
+            {Array.isArray(data) && data.length > 0 ? (
                 data.map((screening) => (
                     <div key={screening._id} style={{ marginBottom: '1rem', border: '1px solid #ddd', padding: '1rem' }}>
                         <h3>Date: {new Date(screening.date).toLocaleDateString()}</h3>

@@ -99,7 +99,18 @@ const createReservation = async (req, res) => {
         // Zapisz zmiany w bazie danych
         await screening.save();
 
-        res.status(201).json({ msg: "Reservation successful!", updatedScreening: screening });
+        // **Zapisanie rezerwacji w bazie**
+        const newReservation = new Reservation({
+            screening_id,
+            user_id,
+            seats
+        });
+
+        const savedReservation = await newReservation.save();
+
+        res.status(201).json({ msg: "Reservation successful!", savedReservation });
+        //
+        // res.status(201).json({ msg: "Reservation successful!", updatedScreening: screening });
 
         // MAIL
 
@@ -114,7 +125,7 @@ const createReservation = async (req, res) => {
 
             const movie = await Movie.findById(screening.movie_id)
 
-            const screeningInfo = `Film: ${movie.title}, Data: ${screening.date.toDateString()}, Godzina: ${screening.time}`;
+            const screeningInfo = `Numer rezerwacji ${savedReservation.reservation_number}. Film: ${movie.title}, Data: ${screening.date.toDateString()}, Godzina: ${screening.time}`;
             const text = `Drogi ${user.username},\nTwoja rezerwacja została potwierdzona.\n\n${screeningInfo}\n\nDziękujemy za skorzystanie z naszego kina!`;
 
 

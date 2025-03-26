@@ -63,12 +63,6 @@ const createRoom = async (req, res) => {
             return res.status(400).json({ msg: "Seats quantity must be a positive number." });
         }
 
-        // // Generate seats directly in the Room schema
-        // const seats = Array.from({ length: seatsQuantity }, (_, i) => ({
-        //     seatNumber: i + 1,
-        //     isReserved: false
-        // }));
-
         // Create the room with generated seats
         const room = new Room({
             roomNumber,
@@ -110,10 +104,6 @@ const createScreening = async (req, res) => {
         if (!movie) return res.status(404).json({ msg: 'Movie not found' });
         if (!room) return res.status(404).json({ msg: 'Room not found' });
 
-
-
-
-
         const newScreening = new Screening({
             movie_id,
             date,
@@ -129,8 +119,6 @@ const createScreening = async (req, res) => {
         console.error('Error creating screening:', error);
         res.status(500).json({ msg: 'Failed to create screening', error });
     }
-
-
 
 };
 
