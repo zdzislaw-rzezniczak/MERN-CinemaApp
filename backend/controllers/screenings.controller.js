@@ -168,4 +168,33 @@ const getRooms = async (req, res) => {
 
 
 
-module.exports = { getRooms, getRoomDetails, createScreening, getScreenings, getScreeningByID, deleteScreening, updateScreening, createRoom};
+
+
+
+
+const getSeatById = async (req, res) => {
+    try {
+        const { screeningId, seatNumber } = req.params; // Assume you get screeningId and seatNumber in params
+        const screening = await Screening.findById(screeningId);
+
+        if (!screening) {
+            return res.status(404).json({ msg: "Screening not found" });
+        }
+
+        // Find the seat by its number within the screening
+        const seat = screening.seats.find(seat => seat.seatNumber === Number(seatNumber));
+
+        if (!seat) {
+            return res.status(404).json({ msg: "Seat not found" });
+        }
+
+        res.status(200).json(seat);
+    } catch (error) {
+        console.error("Error fetching seat:", error);
+        res.status(500).json({ msg: "Server error", error });
+    }
+};
+
+
+
+module.exports = { getSeatById, getRooms, getRoomDetails, createScreening, getScreenings, getScreeningByID, deleteScreening, updateScreening, createRoom};

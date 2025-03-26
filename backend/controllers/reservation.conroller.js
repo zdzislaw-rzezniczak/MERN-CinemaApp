@@ -1,8 +1,10 @@
-
 const Reservation = require('../models/Reservation.model')
-const Room = require('../models/Room.model')
 const Screening = require('../models/Screening.model')
-const mongoose = require("mongoose");
+const User = require('../models/User.model')
+const nodemailer = require('nodemailer');
+const Movie  = require("../models/Movie.model");
+
+
 
 const getReservations = ((req, res) => {
     Reservation.find({})
@@ -55,10 +57,11 @@ const getReservationById = ((req, res) => {
 
 
 const createReservation = async (req, res) => {
+
     try {
         const { screening_id, user_id, seats } = req.body;
 
-        console.log("Received Reservation Request:", req.body);
+        // console.log("Received Reservation Request:", req.body);
 
         if (!seats || !Array.isArray(seats)) {
             return res.status(400).json({ msg: "Invalid seats data. Expected an array." });
@@ -72,6 +75,19 @@ const createReservation = async (req, res) => {
 
         console.log("Screening found:", screening);
 
+
+        const reservations = await Reservation.find({screening_id: screening_id})
+            .populate('user_id', 'username email')
+            .populate('seat_id')
+            .populate({
+                path : 'screening_id',
+                populate : {
+                    path : 'movie_id'},
+
+
+            })
+
+
         // Aktualizuj status rezerwacji dla wybranych miejsc
         screening.seats.forEach((seat) => {
             if (seats.includes(String(seat._id))) {
@@ -84,26 +100,60 @@ const createReservation = async (req, res) => {
         await screening.save();
 
         res.status(201).json({ msg: "Reservation successful!", updatedScreening: screening });
+
+        // MAIL
+
+            const user = await User.findById(user_id);
+            if (!user) {
+                console.error("User not found for email notification");
+                return res.status(201).json({
+                    msg: "Reservation successful but user not found for email notification",
+                    reservations: createdReservations
+                });
+            }
+
+            const movie = await Movie.findById(screening.movie_id)
+
+            const screeningInfo = `Film: ${movie.title}, Data: ${screening.date.toDateString()}, Godzina: ${screening.time}`;
+            const text = `Drogi ${user.username},\nTwoja rezerwacja została potwierdzona.\n\n${screeningInfo}\n\nDziękujemy za skorzystanie z naszego kina!`;
+
+
+
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.APP_PASS_GMAIL
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL,
+            to: user.username,
+            subject: 'Potwierdzenie rezerwacji',
+            text: text
+        };
+
+
+        // Wysyłanie e-maila i obsługa odpowiedzi
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Błąd wysyłki maila:', error);
+                return res.status(500).json({ message: 'Błąd wysyłki maila', error });
+            }
+            console.log('Email wysłany:', info.response);
+            return res.status(201).json({ message: 'Rezerwacja utworzona i mail wysłany!', reservation });
+        });
+
+
+
+
     } catch (error) {
         console.error("Error creating reservation:", error);
         res.status(500).json({ msg: "Server error", error });
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

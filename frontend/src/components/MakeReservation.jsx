@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { Page, Text, Document, StyleSheet } from '@react-pdf/renderer';
@@ -34,6 +34,7 @@ const MakeReservation = ({ fetchInfo }) => {
     const [selectedSeatNumbers, setSelectedSeatNumbers] = useState([]);
     const [userId, setUserId] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchScreening = async () => {
