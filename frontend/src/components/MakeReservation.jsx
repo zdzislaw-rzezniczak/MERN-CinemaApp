@@ -133,10 +133,11 @@ const MakeReservation = ({ fetchInfo }) => {
     if (!data || !data.seats) return <p>No seats available.</p>;
 
     return (
-        <div>
+        <div className={"reservation-container"}>
             <h1>Room Details</h1>
             <p>Seats Quantity: {data.seatsQuantity}</p>
             <ul>
+                <div className={"seat-container"}>
                 {data.seats.map((seat) => (
                     <div
                         key={seat._id}
@@ -149,9 +150,11 @@ const MakeReservation = ({ fetchInfo }) => {
                         }
                         onClick={() => !seat.isReserved && toggleSeatSelection(seat._id, seat.seatNumber)}
                     >
-                        Seat Number: {seat.seatNumber}
+                        {seat.seatNumber}
                     </div>
+
                 ))}
+                </div>
             </ul>
             <button onClick={makeReserv}>Make Reservation</button>
             <h6>{successMessage}</h6>

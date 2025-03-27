@@ -78,7 +78,7 @@ const Reservation = ({ fetchInfo }) => {
                             <p>Title: {reservation.screening_id.movie_id.title}</p>
                             <p>Rezerwacja: {reservation.reservation_string}</p>
                             <p>Seats Reserved: {reservation.seats.length}</p>
-                            <ul>
+                            <ul >
                                 {reservation.seats.map((seat) => (
                                     <li key={seat._id}>Seat number: {seat.seat_id}</li>
                                 ))}

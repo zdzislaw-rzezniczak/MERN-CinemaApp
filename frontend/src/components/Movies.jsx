@@ -24,7 +24,7 @@ const Movies = ({ onLogout, fetchInfo }) => {
             <p>See all our movies!</p>
             {data.length ? (
                 data.map((movie) => (
-                    <div key={movie._id} style={{ marginBottom: '1rem' }}>
+                    <div className={"movies-description"} key={movie._id} style={{ marginBottom: '1rem' }}>
                         <h3>{movie.title}</h3>
                         <p>{movie.description}</p>
                         <img

@@ -9,6 +9,7 @@ import Reservation from "./components/Reservation.jsx";
 import MakeReservation from "./components/MakeReservation.jsx";
 import CreateMovie from "./components/CreateMovie.jsx";
 import CreateScreening from "./components/MakeScreening.jsx";
+import './index.css';
 
 
 

@@ -21,7 +21,7 @@ const Screenings = ({ onLogout, fetchInfo }) => {
 
 
     return (
-        <div style={{ padding: '1rem' }}>
+        <div  style={{ padding: '1rem' }}>
             <h2>Screenings</h2>
             <p>See all our screenings</p>
 
@@ -29,7 +29,7 @@ const Screenings = ({ onLogout, fetchInfo }) => {
 
             {Array.isArray(data) && data.length > 0 ? (
                 data.map((screening) => (
-                    <div key={screening._id} style={{ marginBottom: '1rem', border: '1px solid #ddd', padding: '1rem' }}>
+                    <div className={"screening-description"} key={screening._id} style={{ marginBottom: '1rem', border: '1px solid #ddd', padding: '1rem' }}>
                         <h3>Date: {new Date(screening.date).toLocaleDateString()}</h3>
                         <p>Time: {screening.time}</p>
                         {screening.movie_id && (

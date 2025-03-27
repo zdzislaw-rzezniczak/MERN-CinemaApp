@@ -24,10 +24,17 @@ a:hover {
 
 body {
   margin: 0;
+  color: dimgrey;
   display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+
+  background-image: url('https://c4.wallpaperflare.com/wallpaper/22/762/507/film-movie-filmmaker-movie-director-wallpaper-preview.jpg'); /* Ścieżka do obrazu */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 h1 {
@@ -68,22 +75,139 @@ button:focus-visible {
 }
 
 
-.seat_reserved{
-  background-color: darkred;
 
+
+.seat-container {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  max-width: 600px;
+  margin: 5px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
 }
+
+
+div[class^="seat_"] {
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+
+div[class^="seat_"]:hover {
+  transform: scale(1.1);
+}
+
 
 .seat_reserved {
   background-color: red;
   cursor: not-allowed;
+  color: white;
 }
 
 .seat_available {
   background-color: green;
   cursor: pointer;
+  color: black;
 }
 
 .seat_selected {
   background-color: yellow;
   cursor: pointer;
+  color: dimgrey;
 }
+
+
+.reservation-container {
+  max-width: 1500px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  border: 2px solid #ccc;
+}
+
+div {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+
+
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+/* Etykiety */
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+
+p {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+
+.btn-primary {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+
+
