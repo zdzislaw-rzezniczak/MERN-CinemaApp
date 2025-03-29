@@ -13,3 +13,6 @@ FRONTEND_URL = http://localhost:3000
 APP_PASS_GMAIL= tutaj kod aplikacji z gmaila aplikacja dostępny -> App passwords
 EMAIL= tutaj adres email swój
 VITE_BACKEND_URL = http://localhost:5000/api/
+
+
+po utworzeniu użytkownika należy zmienić wartość isAdmin na true bezpośrednio w bazie
