@@ -1,0 +1,11 @@
+Trzeba zainstalować wszystkie packiety npm z packet jsona
+
+
+.env wartości
+
+TOKEN_KEY = BardzoDługiISkomplikowanyString
+PORT = 5000
+FRONTEND_URL = http://localhost:3000
+APP_PASS_GMAIL= tutaj kod aplikacji z gmaila aplikacja dostępny
+EMAIL= tutaj adres email swój
+VITE_BACKEND_URL = http://localhost:5000/api/
