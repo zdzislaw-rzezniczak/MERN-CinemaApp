@@ -162,26 +162,31 @@ const getRooms = async (req, res) => {
 
 const getSeatById = async (req, res) => {
     try {
-        const { screeningId, seatNumber } = req.params; // Assume you get screeningId and seatNumber in params
-        const screening = await Screening.findById(screeningId);
+        const { screeningId, seatId } = req.params;
+
+
+        // Pobranie screening z miejscami (jeśli są referencjami)
+        const screening = await Screening.findById(screeningId).populate("seats");
 
         if (!screening) {
             return res.status(404).json({ msg: "Screening not found" });
         }
 
-        // Find the seat by its number within the screening
-        const seat = screening.seats.find(seat => seat.seatNumber === Number(seatNumber));
+        // Znalezienie miejsca po jego ID
+        const seat = screening.seats.find(seat => seat._id.toString() === seatId);
 
         if (!seat) {
             return res.status(404).json({ msg: "Seat not found" });
         }
 
-        res.status(200).json(seat);
+        // Zwrócenie numeru miejsca
+        res.status(200).json({ seat_number: seat.seatNumber });
     } catch (error) {
         console.error("Error fetching seat:", error);
         res.status(500).json({ msg: "Server error", error });
     }
 };
+
 
 
 

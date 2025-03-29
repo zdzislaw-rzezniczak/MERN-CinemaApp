@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import {Link, useNavigate, useParams} from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { Page, Text, Document, StyleSheet } from '@react-pdf/renderer';
@@ -35,29 +35,38 @@ const MakeReservation = ({ fetchInfo }) => {
     const [userId, setUserId] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
+    const [shouldRefresh, setShouldRefresh] = useState(false);
+
+
+
+    const fetchScreening = async () => {
+        try {
+            setLoading(true);
+            const screening = await fetchInfo(urlScreening);
+            console.log("Fetched screening data:", screening);
+
+            if (screening?.result) {
+                setData(screening.result);
+            } else {
+                setError("Failed to fetch screening data.");
+            }
+        } catch (err) {
+            setError("Error fetching screening: " + err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchScreening = async () => {
-            try {
-                setLoading(true);
-                const screening = await fetchInfo(urlScreening);
-                console.log("Fetched screening data:", screening);
-
-                if (screening?.result) {
-                    setData(screening.result);
-                } else {
-                    setError("Failed to fetch screening data.");
-                }
-            } catch (err) {
-                setError("Error fetching screening: " + err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchScreening();
         setUserId(getUserId());
     }, [fetchInfo, urlScreening]);
+
+    useEffect(() => {
+        if (shouldRefresh) {
+            window.location.reload();
+        }
+    }, [shouldRefresh]);
 
     const getUserId = () => {
         const token = sessionStorage.getItem('authToken');
@@ -122,6 +131,7 @@ const MakeReservation = ({ fetchInfo }) => {
             }
 
             setSuccessMessage("Reservation successful!");
+
         } catch (err) {
             setError("Error making reservation");
         }
@@ -157,12 +167,18 @@ const MakeReservation = ({ fetchInfo }) => {
                 </div>
             </ul>
             <button onClick={makeReserv}>Make Reservation</button>
+            <Link to={`/reservations/screening/${screeningId}`}>
+                <button style={{ padding: '0.5rem 1rem', marginTop: '1rem' }}>
+                    Reservations
+                </button>
+            </Link>
             <h6>{successMessage}</h6>
+
 
             <PDFDownloadLink
                 document={
                     <MyDocument
-                        roomNumber={data.room_id?.roomNumber || "Unknown"}
+                    cd    roomNumber={data.room_id?.roomNumber || "Unknown"}
                         movieTitle={data.movie_id?.title || "Unknown"}
                         time={data.time || "Unknown"}
                         date={data.date?.slice(0, 10) || "Unknown"}
@@ -170,8 +186,14 @@ const MakeReservation = ({ fetchInfo }) => {
                     />
                 }
                 fileName="reservation.pdf"
+                onClick={() => {
+                    // Ustawiamy flagę do odświeżenia po 3 sekundach (czas na generowanie PDF)
+                    setTimeout(() => setShouldRefresh(true), 1000);
+                }}
+
             >
                 {({ loading }) => (loading ? "Preparing document..." : "Download your reservation as PDF")}
+
             </PDFDownloadLink>
         </div>
     );

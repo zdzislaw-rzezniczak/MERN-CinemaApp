@@ -9,10 +9,16 @@ const Reservation = ({ fetchInfo }) => {
     const [error, setError] = useState(null); // State to track errors
     const [loading, setLoading] = useState(true); // State to show a loading spinner
 
+
+
     const url = `${import.meta.env.VITE_BACKEND_URL}reservations/screening/${screeningId}`;
     const urlScreenings = `${import.meta.env.VITE_BACKEND_URL}screenings/${screeningId}`;
 
+
+
+
     useEffect(() => {
+
         const fetchReservations = async () => {
             try {
                 const response = await fetchInfo(url);
@@ -20,6 +26,7 @@ const Reservation = ({ fetchInfo }) => {
 
                 if (response.reservations && Array.isArray(response.reservations)) {
                     setData(response.reservations); // Handle array data
+
                 } else {
                     console.error('Unexpected reservations data:', response);
                     setData([]); // Handle unexpected cases
@@ -37,6 +44,7 @@ const Reservation = ({ fetchInfo }) => {
     }, [url]); // Ensure dependencies are correctly included
 
     useEffect(() => {
+
         const fetchScreening = async () => {
             try {
                 const screening = await fetchInfo(urlScreenings);
@@ -54,14 +62,83 @@ const Reservation = ({ fetchInfo }) => {
     }, [urlScreenings]);
 
 
+    // useEffect(()=>{
+    //     console.log(data)
+    // }, [data])
+    //
+
+
     useEffect(()=>{
         console.log(data)
     }, [data])
 
 
+
+
+
+
+
+
+    const [reservations, setReservations] = useState([]);
+    const [seatDetails, setSeatDetails] = useState({});
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+
+                // Fetch reservations
+                const reservationsRes = await fetchInfo(
+                    `${import.meta.env.VITE_BACKEND_URL}reservations/screening/${screeningId}`
+                );
+
+                if (!reservationsRes?.reservations) {
+                    throw new Error('Invalid reservations data');
+                }
+
+                setReservations(reservationsRes.reservations);
+
+                // Fetch all seat details
+                const allSeats = reservationsRes.reservations.flatMap(r => r.seats);
+                const uniqueSeats = [...new Set(allSeats)];
+
+                const seatData = {};
+                await Promise.all(
+                    uniqueSeats.map(async (seatId) => {
+                        try {
+                            const response = await fetchInfo(
+                                `${import.meta.env.VITE_BACKEND_URL}screenings/seat/${screeningId}/${seatId}`
+                            );
+                            seatData[seatId] = response.seat_number;
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    })
+                );
+
+                setSeatDetails(seatData);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [screeningId, fetchInfo]);
+
+
+
+
+
+
+
+
     if (loading) return <p>Loading reservation details...</p>;
     if (error) return <p>{error}</p>;
 
+    console.log("Reservations data:", data);
 
     return (
         <div>
@@ -79,13 +156,13 @@ const Reservation = ({ fetchInfo }) => {
                             <p>Rezerwacja: {reservation.reservation_string}</p>
                             <p>Seats Reserved: {reservation.seats.length}</p>
                             <ul >
-                                {reservation.seats.map((seat) => (
-                                    <li key={seat._id}>Seat number: {seat.seat_id}</li>
+                                {reservation.seats.map(seatId => (
+                                    <li key={seatId}>
+                                        Numer miejsca zarezerwowanego: {seatDetails[seatId]}
+                                    </li>
                                 ))}
-
                             </ul>
-                            {/* Uncomment below if `room_id` has `roomNumber` */}
-                            {/* <p>Room: {reservation.room_id.roomNumber}</p> */}
+
                         </li>
                     ))}
                 </ul>
