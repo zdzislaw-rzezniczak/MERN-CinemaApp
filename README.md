@@ -1,5 +1,9 @@
 Trzeba zainstalować wszystkie packiety npm z packet jsona
 
+aby uruchomić:
+- odpalić serwer Mongo
+- cd backend -> npm run dev
+- cd frontend -> npm run start
 
 .env wartości
 
