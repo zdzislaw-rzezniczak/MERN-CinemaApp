@@ -3,6 +3,8 @@ const Screening = require('../models/Screening.model')
 const User = require('../models/User.model')
 const nodemailer = require('nodemailer');
 const Movie  = require("../models/Movie.model");
+const mongoose = require('mongoose')
+const ObjectId = mongoose.Types.ObjectId;
 
 
 
@@ -30,7 +32,7 @@ const getReservationsByScreeningId = async (req, res) => {
 
             })
 
-        console.log(reservations);
+        // console.log(reservations);
         if (!reservations) {
             return res.status(404).json({message: 'No reservation found for this screening.'});
         }
@@ -56,6 +58,47 @@ const getReservationById = ((req, res) => {
 })
 
 
+const getReservationByUserId = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        console.log("User ID from params:", userId);
+
+        if (!userId) {
+            return res.status(400).json({ msg: "User ID is missing in request" });
+        }
+
+        // Sprawdź, czy userId ma poprawny format
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ msg: "Invalid user ID format" });
+        }
+
+        // Pobranie użytkownika z bazy
+        const user = await User.findById(userId);
+        if (!user) {
+            console.log("User not found:", userId);
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+
+        const reservations = await Reservation.find({ user_id: new ObjectId(userId) })
+            .populate('user_id', 'username email')
+            .populate('seat_id')
+            .populate({
+                path : 'screening_id',
+                populate : {
+                    path : 'movie_id'},
+
+
+            })
+
+        res.status(200).json({ reservations });
+    } catch (error) {
+        console.error("Error fetching reservation:", error);
+        res.status(500).json({ msg: "Error fetching reservation" });
+    }
+};
+
+
 const createReservation = async (req, res) => {
 
     try {
@@ -73,7 +116,7 @@ const createReservation = async (req, res) => {
             return res.status(404).json({ msg: "Screening not found" });
         }
 
-        console.log("Screening found:", screening);
+        // console.log("Screening found:", screening);
 
 
         const reservations = await Reservation.find({screening_id: screening_id})
@@ -141,7 +184,7 @@ const createReservation = async (req, res) => {
 
         const mailOptions = {
             from: process.env.EMAIL,
-            to: user.username,
+            to: user.email,
             subject: 'Potwierdzenie rezerwacji',
             text: text
         };
@@ -180,11 +223,66 @@ const deleteReservation = ((req, res) => {
         .catch((error) => res.status(404).json({msg: 'Reservation not found' }))
 })
 
+
+const cancelReservation = async (req, res) => {
+    try {
+        const reservation = await Reservation.findById(req.params.id).populate('screening_id');
+        if (!reservation) {
+            return res.status(404).json({ message: 'Rezerwacja nie znaleziona' });
+        }
+
+
+        if (reservation.user_id.toString() !== req.user.id && !req.user.isAdmin) {
+            return res.status(403).json({ message: 'Brak uprawnień' });
+        }
+
+        reservation.isCancelled = true;
+        await reservation.save();
+
+        const screening = await Screening.findById(reservation.screening_id._id);
+        if (!screening) {
+            return res.status(404).json({ message: 'Screening nie znaleziony' });
+        }
+
+
+        // 5. Zwolnienie miejsc
+        const seatsToFree = reservation.seats.map(seat => seat.toString());
+
+        let seatsUpdated = false;
+
+        screening.seats.forEach(seat => {
+            if (seatsToFree.includes(seat._id.toString())) {
+                seat.isReserved = false;
+                seatsUpdated = true;
+            }
+        });
+
+        screening.markModified('seats');
+        await screening.save();
+
+        res.json({
+            success: true,
+            message: 'Rezerwacja anulowana pomyślnie',
+            updatedSeats: screening.seats.filter(s => seatsToFree.includes(s._id.toString()))
+        });
+
+    } catch (err) {
+        console.error('Błąd podczas anulowania rezerwacji:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Wystąpił błąd podczas anulowania',
+            error: err.message
+        });
+    }
+};
+
 module.exports = {
     getReservations,
     getReservationById,
     createReservation,
     updateReservation,
     deleteReservation,
-    getReservationsByScreeningId
+    getReservationsByScreeningId,
+    getReservationByUserId,
+    cancelReservation
 }

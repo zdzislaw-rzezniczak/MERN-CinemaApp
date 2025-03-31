@@ -18,31 +18,24 @@ function App() {
 
     const fetchInfo = async (url) => {
         const token = sessionStorage.getItem('authToken');
-        if (!token) {
-            console.error('No token found.');
-            return [];
+
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
         }
 
         try {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
+            const response = await fetch(url, { headers });
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Unauthorized');
+                throw new Error(response.status === 401 ? 'Unauthorized' : 'Request failed');
             }
-
-            const item = await response.json();
-            // console.log('Full Response:', JSON.stringify(item, null, 2));
-            return item; // Return the result array
-        } catch (err) {
-            console.error('Error fetching info:', err.message);
-            return [];
+            return await response.json();
+        } catch (error) {
+            console.error(`Error fetching ${url}:`, error);
+            throw error;
         }
     };
 

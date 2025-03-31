@@ -11,6 +11,11 @@ const ReservationSchema = new mongoose.Schema(
             required: false,
         },
 
+        isCancelled: {
+            type: Boolean,
+            default: false,
+        },
+
         screening_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Screening',

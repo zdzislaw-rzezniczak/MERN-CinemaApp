@@ -13,7 +13,7 @@ const Screenings = ({ onLogout, fetchInfo }) => {
 
     useEffect(() => {
         fetchInfo(url).then(screenings => {
-            console.log(screenings);
+            // console.log(screenings);
             setData(screenings.result)
         });
     }, []);

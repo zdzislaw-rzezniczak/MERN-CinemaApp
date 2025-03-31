@@ -6,7 +6,10 @@ const  {
     getReservationById,
     createReservation,
     updateReservation,
-    deleteReservation, getReservationsByScreeningId
+    deleteReservation,
+    getReservationsByScreeningId,
+    getReservationByUserId,
+    cancelReservation
 } = require('../controllers/reservation.conroller')
 const isAdmin = require("../middleware/isAdmin.middleware");
 const {verifyToken} = require("../middleware/jwt.middleware");
@@ -14,6 +17,9 @@ const {verifyToken} = require("../middleware/jwt.middleware");
 router.get('/', verifyToken, getReservations)
 
 router.get('/:id', verifyToken, getReservationById)
+router.patch('/cancel/:id', verifyToken, cancelReservation)
+
+router.get('/user/:id', verifyToken, getReservationByUserId)
 
 router.post('/', verifyToken, createReservation)
 

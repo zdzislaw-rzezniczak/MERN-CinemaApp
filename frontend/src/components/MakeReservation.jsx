@@ -43,7 +43,7 @@ const MakeReservation = ({ fetchInfo }) => {
         try {
             setLoading(true);
             const screening = await fetchInfo(urlScreening);
-            console.log("Fetched screening data:", screening);
+            // console.log("Fetched screening data:", screening);
 
             if (screening?.result) {
                 setData(screening.result);
@@ -109,8 +109,8 @@ const MakeReservation = ({ fetchInfo }) => {
             seats: selectedSeats,
         };
 
-        console.log("Reservation Data Sent to API:", reservationData); // Debugowanie
-
+        // console.log("Reservation Data Sent to API:", reservationData); // Debugowanie
+        //
         const token = sessionStorage.getItem("authToken");
         if (!token) {
             setError("No token found. Please log in.");
