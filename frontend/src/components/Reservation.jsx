@@ -1,7 +1,9 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import {useNavigate} from 'react-router-dom'
 import { jwtDecode } from "jwt-decode";
 
+// eslint-disable-next-line react/prop-types
 const Reservation = ({ fetchInfo }) => {
     const { screeningId } = useParams();
     const [data, setData] = useState([]);
@@ -9,6 +11,7 @@ const Reservation = ({ fetchInfo }) => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [seatDetails, setSeatDetails] = useState({});
+    const navigate = useNavigate();
 
     // Improved getUserId function
     const getUserId = () => {
@@ -80,7 +83,7 @@ const Reservation = ({ fetchInfo }) => {
                     if (!screeningId) {
                         throw new Error('Screening ID is required for admin');
                     }
-                    url = `${import.meta.env.VITE_BACKEND_URL}reservations/screening/${screeningId}`;
+                    url = `http://localhost:5000/api/reservations/screening/${screeningId}`;
                 } else {
 
                     url = `${import.meta.env.VITE_BACKEND_URL}reservations/user/${user.id}`;
@@ -166,6 +169,11 @@ const Reservation = ({ fetchInfo }) => {
         }
     };
 
+    const handlePayment = (reservationId) => {
+
+        navigate(`/stripe/${reservationId}`);
+
+    };
 
     return (
         <div>
@@ -187,17 +195,34 @@ const Reservation = ({ fetchInfo }) => {
                                 ))}
                             </ul>
                             {!reservation.isCancelled && (
+                                <div>
                                 <button
                                     onClick={() => cancelReservation(reservation._id)}
                                     disabled={loading}
                                 >
                                     Cancel Reservation
                                 </button>
+                                    <button
+                                        onClick={() => handlePayment(reservation._id)}
+                                        disabled={reservation.isPaid}
+                                    >
+                                        {reservation.isPaid ? "Already Paid" : "Pay Now"}
+                                    </button>                                </div>
                             )}
                             {reservation.isCancelled && <p>Reservation Cancelled</p>}
+                            <hr  style={{
+                                color: '#000000',
+                                backgroundColor: '#000000',
+                                height: .5,
+                                borderColor : '#000000'
+                            }}/>
                         </li>
+
                     ))}
+
                 </ul>
+
+
             ) : (
                 !loading && <p>No reservations found.</p>
             )}

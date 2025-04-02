@@ -10,6 +10,9 @@ import MakeReservation from "./components/MakeReservation.jsx";
 import CreateMovie from "./components/CreateMovie.jsx";
 import CreateScreening from "./components/MakeScreening.jsx";
 import './index.css';
+import PaymentPage from "./components/Stripe.jsx";
+import PaymentSuccess from "./components/SuccessPage.jsx";
+import PaymentComplete from "./components/PaymentComplete.jsx";
 
 
 
@@ -78,6 +81,14 @@ function App() {
                         </PrivateRoute>
                     }
                 />
+                <Route
+                    path="stripe/:reservationId"
+                    element={
+                        <PrivateRoute token={token}>
+                            <PaymentPage onLogout={handleLogout} fetchInfo={fetchInfo} />
+                        </PrivateRoute>
+                    }
+                />
 
                 <Route
                     path="reservations/screening/:screeningId"
@@ -95,6 +106,8 @@ function App() {
                         </PrivateRoute>
                     }
                 />
+                <Route path="/payment/complete/:reservationId" element={<PaymentComplete />} />
+                <Route path="/payment/success/:reservationId" element={<PaymentSuccess />} />
 
                 <Route
                     path="screenings/make"

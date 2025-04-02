@@ -131,13 +131,24 @@ div[class^="seat_"]:hover {
 
 .reservation-container {
   max-width: 1500px;
-  margin: 40px auto;
+  max-height: 1800px;
+  margin: auto;
   padding: 20px;
   background: #ffffff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   border: 2px solid #ccc;
 }
+.card-element {
+  min-width: 600px;
+  min-height: 300px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  width: 100%;
+}
+
 
 div {
   max-width: 500px;

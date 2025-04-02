@@ -15,6 +15,17 @@ const ReservationSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        isPaid: {
+            type: Boolean,
+            default: false,
+        },
+        paidAt: {
+            type: Date,
+        },
+        paymentId:  {
+            type: String,
+        },
+
 
         screening_id: {
             type: mongoose.Schema.Types.ObjectId,

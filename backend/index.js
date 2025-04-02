@@ -54,6 +54,9 @@ app.use((req, res, next) => {
 const moviesRoutes = require('./routes/movies.routes');
 app.use('/api/movies', moviesRoutes);
 
+const stripeRoutes = require('./stripe/stripe.routes');
+app.use('/api/stripe', stripeRoutes);
+
 const screeningsRoutes = require('./routes/screenings.routes');
 app.use('/api/screenings', screeningsRoutes);
 

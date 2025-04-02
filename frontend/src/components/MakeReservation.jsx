@@ -34,7 +34,7 @@ const MakeReservation = ({ fetchInfo }) => {
     const [selectedSeatNumbers, setSelectedSeatNumbers] = useState([]);
     const [userId, setUserId] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
-    const navigate = useNavigate();
+
     const [shouldRefresh, setShouldRefresh] = useState(false);
 
 
