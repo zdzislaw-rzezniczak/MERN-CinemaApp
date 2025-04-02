@@ -8,21 +8,22 @@ const getPaymentStripe = async (req, res) => {
         const { paymentMethodId } = req.body;
         const reservationId = req.params.id;
 
-        // Validate reservationId format
-        if (!mongoose.Types.ObjectId.isValid(reservationId)) {
-            return res.status(400).json({
-                success: false,
-                message: "Nieprawidłowy identyfikator rezerwacji"
-            });
-        }
-
-        // Validate payment method
-        if (!paymentMethodId || typeof paymentMethodId !== 'string') {
-            return res.status(400).json({
-                success: false,
-                message: "Nieprawidłowa metoda płatności"
-            });
-        }
+        //
+        // // Validate reservationId format
+        // if (!mongoose.Types.ObjectId.isValid(reservationId)) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Nieprawidłowy identyfikator rezerwacji"
+        //     });
+        // }
+        //
+        // // Validate payment method
+        // if (!paymentMethodId || typeof paymentMethodId !== 'string') {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: "Nieprawidłowa metoda płatności"
+        //     });
+        // }
 
         const reservation = await Reservation.findById(reservationId);
         if (!reservation) {
@@ -40,9 +41,9 @@ const getPaymentStripe = async (req, res) => {
         }
 
         const seatQuantity = reservation.seats.length;
-        const amount = 10 * 100 * seatQuantity; // 10 PLN per seat in grosze
+        const amount = 10 * 100 * seatQuantity; // 10 PLN
 
-        // Create and confirm PaymentIntent
+
         const paymentIntent = await stripe.paymentIntents.create({
             amount,
             currency: 'pln',
@@ -54,7 +55,7 @@ const getPaymentStripe = async (req, res) => {
             return_url: `${process.env.FRONTEND_URL}/payment/complete/${reservationId}`
         });
 
-        // Handle payment status
+
         switch (paymentIntent.status) {
             case 'requires_action':
                 return res.json({

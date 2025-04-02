@@ -17,12 +17,10 @@ const CheckoutForm = ({ reservationId, amount }) => {
         setError("");
 
         try {
-            // 1. Validate Stripe is ready
             if (!stripe || !elements) {
                 throw new Error("Stripe not initialized");
             }
 
-            // 2. Create PaymentMethod
             const { error: pmError, paymentMethod } = await stripe.createPaymentMethod({
                 type: 'card',
                 card: elements.getElement(CardElement),
@@ -47,7 +45,6 @@ const CheckoutForm = ({ reservationId, amount }) => {
                 }),
             });
 
-            // 4. Handle response
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || "Payment failed");
@@ -55,7 +52,6 @@ const CheckoutForm = ({ reservationId, amount }) => {
 
             const data = await response.json();
 
-            // 5. Handle 3D Secure if needed
             if (data.requiresAction) {
                 const { error: confirmError } = await stripe.confirmCardPayment(
                     data.clientSecret,

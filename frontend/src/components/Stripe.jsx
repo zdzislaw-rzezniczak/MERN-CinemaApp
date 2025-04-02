@@ -6,11 +6,10 @@ import CheckoutForm from "./CheckoutForm";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 function PaymentPage() {
-    const { reservationId } = useParams(); // Pobierz reservationId z URL
+    const { reservationId } = useParams();
 
-    // Tutaj możesz dodać logikę pobierania kwoty płatności
-    // np. z API na podstawie reservationId
-    const amount = 1000; // Przykładowa kwota (10.00 PLN w groszach)
+
+    const amount = 1000; //10zł
 
     return (
         <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>

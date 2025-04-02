@@ -202,12 +202,14 @@ const Reservation = ({ fetchInfo }) => {
                                 >
                                     Cancel Reservation
                                 </button>
-                                    <button
-                                        onClick={() => handlePayment(reservation._id)}
-                                        disabled={reservation.isPaid}
-                                    >
-                                        {reservation.isPaid ? "Already Paid" : "Pay Now"}
-                                    </button>                                </div>
+                                    {/*<button*/}
+                                    {/*    onClick={() => handlePayment(reservation._id)}*/}
+                                    {/*    disabled={reservation.isPaid}*/}
+                                    {/*>*/}
+                                    {/*    {reservation.isPaid ? "Already Paid" : "Pay Now"}*/}
+                                    {/*</button>                                */}
+
+                                </div>
                             )}
                             {reservation.isCancelled && <p>Reservation Cancelled</p>}
                             <hr  style={{
