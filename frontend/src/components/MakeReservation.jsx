@@ -109,7 +109,7 @@ const MakeReservation = ({ fetchInfo }) => {
             seats: selectedSeats,
         };
 
-        // console.log("Reservation Data Sent to API:", reservationData); // Debugowanie
+        // console.log("Reservation Data Sent to API:", reservationData);
         //
         const token = sessionStorage.getItem("authToken");
         if (!token) {

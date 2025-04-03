@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import {Link} from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+
 
 // eslint-disable-next-line react/prop-types
 const Screenings = ({ onLogout, fetchInfo }) => {
     const [data, setData] = useState([]); // Ensure the initial state is an empty array
     const [error] = useState(''); // For error handling
-
+    const [token, setToken] = useState('');
 
 
 
@@ -16,7 +18,20 @@ const Screenings = ({ onLogout, fetchInfo }) => {
             // console.log(screenings);
             setData(screenings.result)
         });
-    }, []);
+
+        const storedToken = sessionStorage.getItem('authToken');
+        if (storedToken) {
+            try {
+                const decoded = jwtDecode(storedToken);
+                setToken({
+                    token: storedToken,
+                    isAdmin: decoded.isAdmin
+                });
+            } catch (e) {
+                console.error("Invalid token:", e);
+            }
+        }
+    }, [url]);
 
 
 
@@ -50,11 +65,12 @@ const Screenings = ({ onLogout, fetchInfo }) => {
                 <p>No screenings available or failed to load.</p>
             )}
 
-            <Link to="/screenings/make">
+            {token.isAdmin &&
+                (<Link to="/screenings/make">
                 <button style={{ padding: '0.5rem 1rem', marginTop: '1rem' }}>
                     Create screening
                 </button>
-            </Link>
+            </Link>)}
             <button onClick={onLogout} style={{ padding: '0.5rem 1rem', marginTop: '1rem' }}>
                 Logout
             </button>
