@@ -69,14 +69,12 @@ const Reservation = ({ fetchInfo }) => {
 
     useEffect(() => {
         if (!user || !user.id) {
-            // Don't proceed if we don't have a valid user with ID
             return;
         }
 
         const fetchData = async () => {
             try {
                 setLoading(true);
-                let reservationsRes;
                 let url;
 
                 if (user.isAdmin) {
@@ -85,13 +83,10 @@ const Reservation = ({ fetchInfo }) => {
                     }
                     url = `http://localhost:5000/api/reservations/screening/${screeningId}`;
                 } else {
-
                     url = `${import.meta.env.VITE_BACKEND_URL}reservations/user/${user.id}`;
                 }
 
-                console.log('Fetching reservations from:', url); // Debug log
-                reservationsRes = await fetchInfo(url);
-                console.log('Reservations response:', reservationsRes); // Debug log
+                const reservationsRes = await fetchInfo(url);
 
                 if (!reservationsRes?.reservations) {
                     console.warn("No reservations array in response");
@@ -101,8 +96,10 @@ const Reservation = ({ fetchInfo }) => {
 
                 setData(reservationsRes.reservations);
 
-                // Fetch seat details
-                const allSeats = reservationsRes.reservations.flatMap(r => r.seats);
+
+                const activeReservations = reservationsRes.reservations.filter(reservation => !reservation.isCancelled);
+
+                const allSeats = activeReservations.flatMap(r => r.seats);
                 const uniqueSeats = [...new Set(allSeats)];
                 const seatData = {};
 
@@ -115,6 +112,7 @@ const Reservation = ({ fetchInfo }) => {
                             seatData[seatId] = response.seat_number;
                         } catch (err) {
                             console.error(`Error fetching seat ${seatId}:`, err);
+                            seatData[seatId] = 'Error fetching seat';
                         }
                     })
                 );
@@ -131,6 +129,7 @@ const Reservation = ({ fetchInfo }) => {
         fetchData();
     }, [user, screeningId]);
 
+
     if (loading) return <p>Loading reservation details...</p>;
     if (error) return <p>Error: {error}</p>;
 
@@ -138,7 +137,6 @@ const Reservation = ({ fetchInfo }) => {
         try {
             setLoading(true);
 
-            // Call your backend API to cancel the reservation
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}reservations/cancel/${reservationId}`, {
                 method: 'PATCH',
                 headers: {
@@ -152,7 +150,6 @@ const Reservation = ({ fetchInfo }) => {
                 throw new Error('Failed to cancel reservation');
             }
 
-            // Update the local state to reflect the cancellation
             setData(prevData =>
                 prevData.map(reservation =>
                     reservation._id === reservationId
@@ -179,7 +176,7 @@ const Reservation = ({ fetchInfo }) => {
         <div>
             <h1>Reservations</h1>
             {data.length > 0 ? (
-                <ul>
+                <ul style={{ listStyleType: 'none' }}>
                     {data.map((reservation) => (
                         <li key={reservation._id}>
                             <p>User: {reservation.user_id?.username || 'Unknown'}</p>
@@ -187,13 +184,17 @@ const Reservation = ({ fetchInfo }) => {
                             <p>Reservation: {reservation.reservation_string}</p>
 
                             <p>Seats Reserved: {reservation.seats?.length || 0}</p>
-                            <ul>
+
+                            {!reservation.isCancelled && (<ul>
                                 {reservation.seats?.map(seatId => (
                                     <li key={seatId}>
                                         Seat Number: {seatDetails[seatId] || 'Unknown'}
                                     </li>
                                 ))}
-                            </ul>
+                            </ul>)}
+
+
+
                             {!reservation.isCancelled && (
                                 <div>
                                 <button

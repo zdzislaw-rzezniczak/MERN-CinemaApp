@@ -17,6 +17,7 @@ const Screenings = ({ onLogout, fetchInfo }) => {
         fetchInfo(url).then(screenings => {
             // console.log(screenings);
             setData(screenings.result)
+            console.log(screenings);
         });
 
         const storedToken = sessionStorage.getItem('authToken');
@@ -53,7 +54,7 @@ const Screenings = ({ onLogout, fetchInfo }) => {
                                 <p>Description: {screening.movie_id.description}</p>
                             </>
                         )}
-                        {screening.room_id && <p>Room Number: {screening.roomNumber}</p>}
+                        {/*{screening.room_id && <p>Room Number: {screening.roomNumber}</p>}*/}
                         <Link to={`/reservations/room/${screening.room_id}/${screening._id}`} style={{ color: 'blue', textDecoration: 'underline' }}>
                             Make a Reservation
                         </Link>

@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
     title: { fontSize: 24, marginBottom: 10 },
 });
 
+// eslint-disable-next-line react/prop-types
 const MakeReservation = ({ fetchInfo }) => {
     const { screeningId } = useParams();
     const urlScreening = `http://localhost:5000/api/screenings/${screeningId}`;
@@ -133,7 +134,7 @@ const MakeReservation = ({ fetchInfo }) => {
             setSuccessMessage("Reservation successful!");
 
         } catch (err) {
-            setError("Error making reservation");
+            setError("Error making reservation", err);
         }
     };
 
@@ -144,7 +145,7 @@ const MakeReservation = ({ fetchInfo }) => {
 
     return (
         <div className={"reservation-container"}>
-            <h1>Room Details</h1>
+            <h1>Room {data.room_id?.roomNumber}</h1>
             <p>Seats Quantity: {data.seatsQuantity}</p>
             <ul>
                 <div className={"seat-container"}>
