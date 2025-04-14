@@ -67,4 +67,8 @@ const reservationsRoutes = require('./routes/reservation.routes');
 app.use('/api/reservations', reservationsRoutes);
 
 const roomRoutes = require('./routes/room.routes');
-app.use('/api/rooms', roomRoutes); // To musi być!
+app.use('/api/rooms', roomRoutes);
+
+///////////////////////PAYPAL
+
+app.use('/api/payments', require('./paypal/paypal.routes'));

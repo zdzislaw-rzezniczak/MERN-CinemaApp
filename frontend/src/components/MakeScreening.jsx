@@ -53,10 +53,10 @@ const CreateScreening = ({ fetchInfo }) => {
             return;
         }
 
-        if(!token.isAdmin) {
-            setMessage("You are not admin");
-            return;
-        }
+        // if(!token.isAdmin) {
+        //     setMessage("You are not admin");
+        //     return;
+        // }
 
         const { movie_id, date, time, room_id } = formData;
 

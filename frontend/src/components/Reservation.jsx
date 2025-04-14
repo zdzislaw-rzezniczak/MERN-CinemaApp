@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import {useNavigate} from 'react-router-dom'
 import { jwtDecode } from "jwt-decode";
 
+
+
 // eslint-disable-next-line react/prop-types
 const Reservation = ({ fetchInfo }) => {
     const { screeningId } = useParams();
@@ -172,6 +174,10 @@ const Reservation = ({ fetchInfo }) => {
 
     };
 
+    function handlePaymentPayPal(reservationId) {
+        navigate(`/paypal/${reservationId}`);
+    }
+
     return (
         <div>
             <h1>Reservations</h1>
@@ -203,12 +209,26 @@ const Reservation = ({ fetchInfo }) => {
                                 >
                                     Cancel Reservation
                                 </button>
-                                    {/*<button*/}
-                                    {/*    onClick={() => handlePayment(reservation._id)}*/}
-                                    {/*    disabled={reservation.isPaid}*/}
-                                    {/*>*/}
-                                    {/*    {reservation.isPaid ? "Already Paid" : "Pay Now"}*/}
-                                    {/*</button>                                */}
+
+
+
+                                    <button
+                                        onClick={() => handlePaymentPayPal(reservation._id)}
+                                        disabled={reservation.isPaid}
+                                    >
+                                        {reservation.isPaid ? "Already Paid" : "PayPal"}
+                                    </button>
+
+                                    <button
+                                        onClick={() => handlePayment(reservation._id)}
+                                        disabled={reservation.isPaid}
+                                    >
+                                        {reservation.isPaid ? "Already Paid" : "Pay With Stripe"}
+                                    </button>
+
+
+
+
 
                                 </div>
                             )}

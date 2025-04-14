@@ -14,7 +14,14 @@ import PaymentPage from "./components/Stripe.jsx";
 import PaymentSuccess from "./components/SuccessPage.jsx";
 import PaymentComplete from "./components/PaymentComplete.jsx";
 
+import {PayPalScriptProvider} from "@paypal/react-paypal-js"
+import PayPalButton from './components/PayPalButton';
 
+const initialOptions = {
+    "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID ,
+    currency: "PLN",
+    intent: "capture",
+};
 
 function App() {
     const [token, setToken] = useState(sessionStorage.getItem('authToken') || null);
@@ -108,6 +115,17 @@ function App() {
                 />
                 <Route path="/payment/complete/:reservationId" element={<PaymentComplete />} />
                 <Route path="/payment/success/:reservationId" element={<PaymentSuccess />} />
+
+
+
+                <Route
+                    path="/paypal/:reservationId"
+                    element={
+                        <PayPalScriptProvider options={initialOptions}>
+                            <PayPalButton />
+                        </PayPalScriptProvider>
+                    }
+                />
 
                 <Route
                     path="screenings/make"
