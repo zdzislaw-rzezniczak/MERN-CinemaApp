@@ -1,13 +1,18 @@
 const jwt = require('jsonwebtoken');
 
-const createSecretToken = (userId, isAdmin) => {
+const createSecretToken = (userId, isAdmin = false) => {
+    if (!userId) {
+        throw new Error("User ID is required to generate token.");
+    }
+
     const payload = {
         id: userId,
-        isAdmin: isAdmin, // Dodaj isAdmin
+        isAdmin,
     };
 
-    return jwt.sign(payload, process.env.TOKEN_KEY, { expiresIn: '1h' });
+    return jwt.sign(payload, process.env.TOKEN_KEY, {
+        expiresIn: '1h',
+    });
 };
 
-
-module.exports = {createSecretToken}
+module.exports = {createSecretToken};

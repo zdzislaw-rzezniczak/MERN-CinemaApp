@@ -1,5 +1,5 @@
 const express = require("express");
-const { getPaymentStripe } = require("../stripe/stripe.controller");
+const {getPaymentStripe} = require("../stripe/stripe.controller");
 
 const router = express.Router();
 

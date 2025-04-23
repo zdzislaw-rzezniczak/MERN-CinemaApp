@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const paypal = require('@paypal/checkout-server-sdk');
-const { client } = require('./paypal.config');
-const Reservation = require('../models/Reservation.model');
+const {client} = require('./paypal.config');
+const Reservation = require('../models/reservation.model');
 
 
 const getReservation = async (req, res, next) => {
@@ -79,7 +79,7 @@ router.post('/create-payment/:id', getReservation, async (req, res) => {
 // Finalizacja płatności
 router.post('/capture-payment/:orderID', async (req, res) => {
     try {
-        const { orderID } = req.params;
+        const {orderID} = req.params;
         const request = new paypal.orders.OrdersCaptureRequest(orderID);
         request.requestBody({});
 
@@ -106,7 +106,7 @@ router.post('/capture-payment/:orderID', async (req, res) => {
                 paymentStatus: 'COMPLETED',
                 paymentDetails: captureResult
             },
-            { new: true, runValidators: true }
+            {new: true, runValidators: true}
         );
 
         if (!updateResult) {
@@ -138,9 +138,9 @@ router.post('/capture-payment/:orderID', async (req, res) => {
         // Aktualizacja statusu rezerwacji w przypadku niepowodzenia
         try {
             const failedUpdate = await Reservation.findOneAndUpdate(
-                { paymentId: req.params.orderID },
-                { paymentStatus: 'FAILED', paymentError: err.message },
-                { new: true }
+                {paymentId: req.params.orderID},
+                {paymentStatus: 'FAILED', paymentError: err.message},
+                {new: true}
             );
             console.log('Failed payment update attempt:', failedUpdate);
         } catch (dbErr) {

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const  {
+const {
     getReservations,
     getReservationById,
     createReservation,
@@ -10,8 +10,8 @@ const  {
     getReservationsByScreeningId,
     getReservationByUserId,
     cancelReservation
-} = require('../controllers/reservation.conroller')
-const isAdmin = require("../middleware/isAdmin.middleware");
+} = require('../controllers/reservation.controller')
+const isAdmin = require("../middleware/auth.middleware");
 const {verifyToken} = require("../middleware/jwt.middleware");
 
 router.get('/', verifyToken, getReservations)

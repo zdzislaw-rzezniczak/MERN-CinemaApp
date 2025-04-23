@@ -1,62 +1,60 @@
-const User = require('../models/User.model');
-
-const {createSecretToken} = require('../token_generation/generateToken')
+const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
+const {createSecretToken} = require('../token_generation/generateToken');
 
+const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
 
 const createUser = async (req, res) => {
-    // pobranie danych od użytkownika
-    // sprawdzenie poprawności otrzymanych danyhch
     try {
-        if (
-            !(
-                req.body.email &&
-                req.body.password &&
-                req.body.username
-            )
-        ) {
-            res.status(400).send("All fields are required");
+        const {email, password, username} = req.body;
+
+        // Sprawdzenie poprawności otrzymanych danyhch
+        if (!email || !password || !username) {
+            return res.status(400).json({message: "All fields are required."});
         }
 
-        //sprawdzenie czy użytkownik już istnieje
-        const existingUser = await User.findOne({ email: req.body.email });
+        // Sprawdzenie czy użytkownik już istnieje
+        const [existingUser, usernameTaken] = await Promise.all([
+            User.findOne({email}),
+            User.findOne({username}),
+        ]);
 
         if (existingUser) {
-            return res.status(409).json({ message: "Email already exists" });
+            return res.status(409).json({message: "Email already exists."});
         }
 
-        const usernameTaken = await User.findOne({ username: req.body.username });
         if (usernameTaken) {
-            return res.status(409).json({message: "Username already taken" });
+            return res.status(409).json({message: "Username already taken."});
         }
-        const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hash(req.body.password, salt);
 
+        // Zahash hasła
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = new User({
+        // Stworzenie nowego użytkownika
+        const user = await new User({
+            username,
+            email,
+            password: hashedPassword,
+        }).save();
 
-            username: req.body.username,
-            email: req.body.email,
-            password: hashPassword,
-
-        });
-        //zapis użytkownika do bazy
-        const user = await newUser.save();
+        // Generate token
         const token = createSecretToken(user._id);
 
         res.cookie("token", token, {
-            path: "/", // Cookie is accessible from all paths
-            expires: new Date(Date.now() + 86400000), // Cookie expires in 1 day
-            secure: true, // Cookie will only be sent over HTTPS
-            httpOnly: true, // Cookie cannot be accessed via client-side scripts
+            path: "/",
+            expires: new Date(Date.now() + ONE_DAY_IN_MS),
+            secure: true,
+            httpOnly: true,
             sameSite: "None",
         });
 
-        console.log("cookie set succesfully");
-        res.status(201).send("User created: " + user.username);
-    }
-    catch (error) {
-        console.error('Error creating user:', error);}
+        console.log("Cookie set successfully");
+        res.status(201).send(`User created: ${user.username}`);
 
+    } catch (error) {
+        console.error("Error creating user:", error);
+        res.status(500).json({message: "Internal server error"});
+    }
 };
+
 module.exports = createUser;

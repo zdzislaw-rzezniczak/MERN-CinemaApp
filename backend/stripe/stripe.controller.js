@@ -1,60 +1,18 @@
-const Reservation = require("../models/Reservation.model");
-const mongoose = require("mongoose");
-const Stripe = require('stripe');
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const createStripeClient = require("./stripe.factory");
+const StripeService = require("./stripe.service");
+
+const stripe = createStripeClient();
+const stripeService = new StripeService(stripe);
 
 const getPaymentStripe = async (req, res) => {
     try {
-        const { paymentMethodId } = req.body;
-        const reservationId = req.params.id;
+        const {paymentMethodId} = req.body;
+        const {id: reservationId} = req.params;
 
-        //
-        // // Validate reservationId format
-        // if (!mongoose.Types.ObjectId.isValid(reservationId)) {
-        //     return res.status(400).json({
-        //         success: false,
-        //         message: "Nieprawidłowy identyfikator rezerwacji"
-        //     });
-        // }
-        //
-        // // Validate payment method
-        // if (!paymentMethodId || typeof paymentMethodId !== 'string') {
-        //     return res.status(400).json({
-        //         success: false,
-        //         message: "Nieprawidłowa metoda płatności"
-        //     });
-        // }
-
-        const reservation = await Reservation.findById(reservationId);
-        if (!reservation) {
-            return res.status(404).json({
-                success: false,
-                message: "Rezerwacja nie znaleziona"
-            });
-        }
-
-        if (reservation.isPaid) {
-            return res.status(400).json({
-                success: false,
-                message: "Rezerwacja została już opłacona"
-            });
-        }
-
-        const seatQuantity = reservation.seats.length;
-        const amount = 10 * 100 * seatQuantity; // 10 PLN
-
-
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount,
-            currency: 'pln',
-            payment_method: paymentMethodId,
-            confirm: true,
-            payment_method_types: ['card'],
-            metadata: { reservationId },
-            description: `Płatność za rezerwację ${reservationId}`,
-            return_url: `${process.env.FRONTEND_URL}/payment/complete/${reservationId}`
+        const {paymentIntent, reservation} = await stripeService.processPayment({
+            paymentMethodId,
+            reservationId
         });
-
 
         switch (paymentIntent.status) {
             case 'requires_action':
@@ -65,10 +23,7 @@ const getPaymentStripe = async (req, res) => {
                     message: "Wymagane dodatkowe potwierdzenie płatności"
                 });
             case 'succeeded':
-                reservation.isPaid = true;
-                reservation.paidAt = new Date();
-                reservation.paymentId = paymentIntent.id;
-                await reservation.save();
+                await stripeService.updateReservationAfterPayment(reservation, paymentIntent);
                 return res.json({
                     success: true,
                     message: "Płatność zakończona sukcesem",
@@ -87,15 +42,11 @@ const getPaymentStripe = async (req, res) => {
             default:
                 return res.status(400).json({
                     success: false,
-                    message: `Nieoczekiwany status płatności: ${paymentIntent.status}`
+                    message: `Nieoczekiwany status: ${paymentIntent.status}`
                 });
         }
     } catch (err) {
         console.error("Błąd płatności:", err);
-        if (err.raw) {
-            console.error("Stripe error:", err.raw);
-        }
-
         return res.status(500).json({
             success: false,
             message: "Wystąpił błąd podczas przetwarzania płatności",
@@ -104,4 +55,4 @@ const getPaymentStripe = async (req, res) => {
     }
 };
 
-module.exports = { getPaymentStripe };
+module.exports = {getPaymentStripe};

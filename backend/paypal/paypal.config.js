@@ -7,4 +7,4 @@ const clientSecret = process.env.PAYPAL_SECRET;
 const environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
 const client = new paypal.core.PayPalHttpClient(environment);
 
-module.exports = { client };
+module.exports = {client};
