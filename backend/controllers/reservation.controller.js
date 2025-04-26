@@ -37,7 +37,6 @@ const getReservationsByScreeningId = async (req, res) => {
             return res.status(404).json({message: 'No reservation found for this screening.'});
         }
 
-        giat
         res.status(200).json({
             reservations,
             // Zarezerwowane miejsca z numerem i statusem
