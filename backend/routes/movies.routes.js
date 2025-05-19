@@ -1,17 +1,17 @@
 const express = require('express');
 const router = express.Router();
 
-const  {
+const {
     getMovies,
     getMovieById,
     createMovie,
     updateMovie,
     deleteMovie
-} = require('../controllers/movies.conroller')
-const isAdmin = require("../middleware/isAdmin.middleware");
+} = require('../controllers/movies.controller')
+const isAdmin = require("../middleware/auth.middleware");
 const {verifyToken} = require("../middleware/jwt.middleware");
 
-router.get('/',  getMovies)
+router.get('/', getMovies)
 
 router.get('/:id', verifyToken, getMovieById)
 

@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 
-
 const ScreeningSchema = new mongoose.Schema({
     movie_id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -30,8 +29,8 @@ const ScreeningSchema = new mongoose.Schema({
     },
     seats: [
         {
-            seatNumber: { type: Number, required: true },
-            isReserved: { type: Boolean, default: false }
+            seatNumber: {type: Number, required: true},
+            isReserved: {type: Boolean, default: false}
         }
     ]
 
